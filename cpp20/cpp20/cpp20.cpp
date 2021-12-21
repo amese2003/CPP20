@@ -4,114 +4,34 @@
 
 using namespace std;
 
-template<typename T>
-concept integral = std::is_integral_v<T>;
-
-// 오늘의 주제 : concept (컨셉)
-
-//void TestInt(int number)
-//{
-//    cout << number << endl;
-//}
-//
-//template<typename T>
-//void TestTemplate(T number)
-//{
-//    cout << number << endl;
-//}
-
-// 1) Requires Clause(절)
-template<typename T>
-requires std::integral<T>
-void TestConcept1(T number)
-{
-	cout << number << endl;
-}
-
-// 2) Trailing Requires Clause (뒤에 붙는...)
-template<typename T>
-void TestConcept2(T number) requires std::integral<T>
-{
-	cout << number << endl;
-}
-
-// 3) Constrained Template Parameter (강요된)
-template<std::integral T>
-void TestConcept3(T number)
-{
-	cout << number << endl;
-}
-
-// 4) Abbreviated Function Template
-void TestConcept4(std::integral auto number)
-{
-	cout << number << endl;
-}
-
-class GameObject
-{
-
-};
-
-class Knight : public GameObject
-{
-
-};
-
-template<typename T>
-requires std::derived_from<T, GameObject>
-void TestObject(T* obj)
-{
-
-}
-
-template<typename T>
-concept MyConcept = !std::is_integral_v<T> && std::derived_from<T, GameObject>;
-
-template<typename T>
-concept Addable = requires (T a, T b)
-{
-	a + b;
-};
-
-template<typename T>
-concept Equality = requires(T a, T b)
-{
-	{a == b} -> std::convertible_to<bool>;
-	{a != b} -> std::convertible_to<bool>;
-};
-
-template<typename T>
-concept integral = std::is_integral_v<T>;
-
-template<typename T>
-concept SignedInt =  std::is_signed_v<T>;
+import Math;
+//import Math.time;
+// 오늘의 주제 : module
+import MathPartition;
 
 
 int main()
 {
-	TestConcept2(10);
-	//TestConcept2(1.3f);
+	// 전처리
+	// - #include #define
+	// 컴파일
+	// - 오브젝트 파일 .obj
+	// 링크
 
-	const bool check = _Is_any_of_v<int, short, int, long long>;
+	// 기존 사용하던 방법의 문제점
+	// 1) 빌드속도 (반복된 substitution)
+	// 너무너무 느리다
+	// 2) 매크로 (#define)
+	// 3) 심볼 중복 정의
 
-	// same_as
-	// derived_from
+	// Module
+	// - 모듈은 딱 한번만 import 된다
+	// - import 순서에 상관 없음
+	// - 심볼 중복 정의
+	// - 모듈의 이름도 지정 가능
+	// - 인터페이스 / 구현부 분리 관리 필요없음
+	int sum = Add(1,2);
 
-	// integral
-	//
+	//MathTimeFunc();
 
-	// destructible
-	// move_constructible
-
-	// equality_comparable
-
-
-
-
-	/*list<int> li;
-	std::sort(li.begin(), li.end());*/
-
-	TestObject(new Knight);
-	//TestObject(new int);
 }

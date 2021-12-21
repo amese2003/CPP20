@@ -1,0 +1,9 @@
+{
+    "Version": "1.1",
+    "Data": {
+        "Source": "d:\\project\\cpp20\\cpp20\\cpp20\\mathpartition_1.ixx",
+        "ProvidedModule": "MathPartition:MathPartition_1",
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

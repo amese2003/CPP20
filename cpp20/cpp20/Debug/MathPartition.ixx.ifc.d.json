@@ -1,0 +1,19 @@
+{
+    "Version": "1.1",
+    "Data": {
+        "Source": "d:\\project\\cpp20\\cpp20\\cpp20\\mathpartition.ixx",
+        "ProvidedModule": "MathPartition",
+        "Includes": [],
+        "ImportedModules": [
+            {
+                "Name": "MathPartition:MathPartition_1",
+                "BMI": "D:\\Project\\CPP20\\cpp20\\cpp20\\Debug\\MathPartition_1.ixx.ifc"
+            },
+            {
+                "Name": "MathPartition:MathPartition_2",
+                "BMI": "D:\\Project\\CPP20\\cpp20\\cpp20\\Debug\\MathPartition_2.ixx.ifc"
+            }
+        ],
+        "ImportedHeaderUnits": []
+    }
+}
