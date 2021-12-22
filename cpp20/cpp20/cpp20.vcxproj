@@ -144,6 +144,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cpp20.cpp" />
+    <ClCompile Include="MyCoroutine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyCoroutine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

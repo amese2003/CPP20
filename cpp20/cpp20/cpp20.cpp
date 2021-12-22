@@ -1,164 +1,138 @@
 ﻿#include <iostream>
-#include <algorithm>
+using namespace std;
 #include <list>
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <ranges>
+#include <concepts>
+#include <coroutine>
+#include "MyCoroutine.h"
+// 오늘의 주제 : Corutine
 
-using namespace std;
+
+// 유니티 = 코루틴
+// - c#에서 있는  코루틴 문법을 유니티에서 적극적으로 채용해서 제공
 
 
-// 오늘의 주제 : Range
-
-template<std::ranges::input_range Range>
-requires std::ranges::view<Range>
-class ContainerView : public std::ranges::view_interface<ContainerView<Range>>
+struct CoroutineObject
 {
-public:
-	ContainerView() = default;
-
-	constexpr ContainerView(Range r) : _range(std::move(r)), _begin(std::begin(r)), _end(std::end(r))
+	// 1) promise 객체는 다음과 같은 인터페이스를 제공해야 함
+	// - 기본 생성자 : promise 객체는 기본 생성자로 만들어질 수 있어야 함
+	// - get_return_object : 코루틴 객체를 반환 (resumable object)
+	// - return_value(val) : co_return val에 의해 호출됨 (코루틴이 영구적으로 끝나지 않으면 없어도 됨)
+	// - return_void() : co_return에 의해 호출됨 (코루틴이 영구적으로 끝나지 않으면 없어도 됨)
+	// - yield_value(val) : co_yield에 의해 호출됨
+	// - initial_suspend() : 코루틴이 실행 전에 중단/연기될 수 있는지
+	// - final_suspend() : 코루틴이 종료 전에 중단/연기될 수 있는지
+	// - unhandled_exception() : 예외 처리시 호출됨
+	struct promise_type
 	{
-
-	}
-
-	constexpr auto begin() const { return _begin; }
-	constexpr auto end() const { return _end; }
-
-private:
-	Range _range;
-	std::ranges::iterator_t<Range> _begin;
-	std::ranges::iterator_t<Range> _end;
+		CoroutineObject get_return_object() { return {}; }
+		std::suspend_never initial_suspend() const noexcept { return {}; }
+		std::suspend_never final_suspend() const noexcept { return {}; }
+		void return_void() { }
+		void unhandled_exception() { }
+	};
 };
 
-template<typename Range>
-ContainerView(Range&& range)->ContainerView<std::ranges::views::all_t<Range>>;
-
-
-struct Knight
+CoroutineObject HelloCoroutine()
 {
-	std::string		name;
-	int				id;
-};
 
+	co_return;
+}
+
+Future<int> CreateFuture()
+{
+	co_return 2021;
+}
+
+Generator<int> GenNumbers(int start = 0, int delta = 1)
+{
+	int now = start;
+
+	while (true)
+	{
+		co_yield now;
+		now += delta;
+	}
+}
+
+Job PrepareJob()
+{
+	// co_await [Awaitable]
+	co_await std::suspend_never();
+}
 
 
 int main()
 {
-	// C# Linq 문법이랑 비슷하다?
-	vector<int> v1 = { 1,2,3,4,5,6,7,8,9,10 };
+	// 함수가 코루틴이 되리면?
+	// - co_return
+	// - co_yield
+	// - co_await
 
-	vector<int> v2;
-	// 짝수?
-
-	for (int n : v1)
-		if ((n & 1) != 1)
-			v2.push_back(n);
-
-
-	// 2를 곱해준다
-	for (int& n : v2)
-		n <<= 1;
-
-	//std::for_each();
-	//std::find_if();
-	//std::any_of();
-
-	auto results = v1 | std::views::filter([](int n) {return (n & 1) != 1; })
-		| std::views::transform([](int n) {return n <<= 1; });
-
-	/*for (auto n : results)
-		cout << n << " ";*/
-
-	// Range : Range란 순회할 수 있는 아이템 그룹 (ex. STL Container)
-	// View : Range에 대해서 적용할 수 있는 연산
-
-	// std::views::all		
-	// std::ranges::filter_view / std::views::filter (조건 만족하는거 추출)
-	// std::ranges::transform_view / std::views::transform (각 요소를 변환)
-	// std::ranges::take_view / std::views::take (n개 요소를 추출)
-	// std::ranges::take_while_view / std::views::take_while (조건 만족할 때까지 요소 추출)
-	// std::ranges::drop_view / std::views::drop (n개 요소를 스킵)
-	// std::ranges::drop_while_view / std::views::drop_while (조건 만족할 때까지 요소 스킵)
-	// std::ranges::join_view / std::views::join (view 를 병합)
-	// std::ranges::split_view / std::views::split (split)
-	// std::ranges::reverse_view / std::views::reverse (역순서로 순회)
-	// std::ranges::elements_view / std::views::elements (튜플의 n번째 요소를 대상으로 view 생성)
-	// std::ranges::keys_view / std::views::keys (pair-like value의 첫번째 요소를 대상으로 view 생성)
-	// std::ranges::values_view / std::views::values (pair-like value의 두번째 요소를 대상으로 view 생성)
-
-	auto results2 = v1 | std::views::filter([](int n) {return (n & 1) != 1; })
-		| std::views::transform([](int n) {return n <<= 1; })
-		| std::views::take(3);
-
-	for (auto n : results2)
-		cout << n << " ";
-
-	cout << endl;
-	//std::sort(v1.begin(), v1.end());
-	std::ranges::sort(v1, less<int>());
-
-	vector<Knight> knights =
-	{
-		{ "Nero", 1},
-		{ "Faker", 2},
-		{ "Dopa", 3},
-		{ "Deft", 4},
-	};
-
-
-	std::ranges::sort(knights, {}, &Knight::name); // ascending by name	
-	std::ranges::sort(knights, std::ranges::greater(), &Knight::name); // descending by name	
-	std::ranges::sort(knights, {}, &Knight::id); // ascending by id	
-	std::ranges::sort(knights, std::ranges::greater(), &Knight::id); // ascending by id
-
-
-	map<string, int> m =
-	{
-		{ "Nero", 1},
-		{ "Faker", 2},
-		{ "Dopa", 3},
-		{ "Deft", 4},
-	};
-
-	for (const auto& name : std::views::keys(m) | std::views::reverse)
-	{
-		cout << name << endl;
-	}
-
-	// 0 ~ 100 사이에서 숫자중 소수인 5개의 숫자를 추출하라?
-	std::vector<int> v3;
-
-	// std::views::iota(a,b) : a부터 시작해서 1씩 증가 b개를 만들어줌
-
-	auto isPrime = [](int num)
-	{
-		if (num <= 1)
-			return false;
-
-		for (int n = 2; n * n <= num; n++)
+	// 코루틴을 사용할 수 있는 Framework를 제공한다. (...)
+	// 3가지 요소로 구성
+	// - promise 객체
+	// - 코루틴 핸들 (밖에서 코루틴을 resume / destroy 할 때 사용. 일종의 리모컨)
+	// - 코루틴 프레임 (promise 객체, 코루틴이 인자 등을 포함하는 heap 할당 객체)
+	// 
+	// co_yield, co_await, co_return을 함수 안에서 사용하면, 그 함수는 코루틴이 됨.
+	/*{
+		Promise prom; (get_return_object)
+		co_await prom.initial_suspend();
+		try
 		{
-			if (num % n == 0)
-				return false;
+			// co_return, co_yield, co_await를 포함하는 코드
 		}
+		catch (...)
+		{
+			prom.unhandled_exception();
+		}
+		co_await prom.final_suspend();
+	}*/
 
-		return true;
-	};
 
-	for (int n : std::views::iota(0, 100) | std::views::filter(isPrime) | std::views::take(5))
+	// co_await 플로우
+	/*{
+		if awaitable.await_ready() returns false;
+			suspend coroutine
+			awaitable.await_suspend(handle) returns:
+				void:
+					awaitable.await_suspend(handle);
+					coroutine keeps suspended
+					return to caller
+				bool:
+					bool result = awaitable.await_suspend(handle);
+					if (result)
+						coroutine keeps suspended
+						return to caller
+					else
+						return awaitable.await_resume()
+				another coroutine handle:
+					anotherCoroutineHandle = awaitable.await_suspend(handle);
+					anotherCoroutineHandle.resume();
+					return to caller;
+		return awaitable.await_resume();
+	}*/
+
+
+	auto future = CreateFuture();
+
+	// TODO : 다른걸 하다.....
+
+	cout << future.get() << endl;
+
+	auto numbers = GenNumbers(0, 1);
+	for (int i = 0; i < 20; i++)
 	{
-		v3.push_back(n);
+		numbers.next();
+
+		cout << " " << numbers.get();
 	}
 
-	// 커스텀 뷰 (std::ranges::view_interface)
+	auto job = PrepareJob();
 
-	std::vector<int> myVec{ 1,2,3,4,5 };
-	auto myView = ContainerView(myVec);
-
-	for (auto n : myView)
-	{
-		cout << n << endl;
-	}
-
+	job.start();
 }
