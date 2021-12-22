@@ -1,9 +1,4 @@
-﻿  모듈 종속성의 소스를 검사하는 중...
-  MathPartition_2.ixx
-  MathPartition_1.ixx
-  컴파일하는 중...
-  MathPartition_1.ixx
-  MathPartition_2.ixx
-  MathPartition.ixx
-  cpp20.cpp
+﻿  cpp20.cpp
+  The contents of <ranges> are available only in c++latest mode with concepts support;
+  see https://github.com/microsoft/STL/issues/1814 for details.
   cpp20.vcxproj -> D:\Project\CPP20\cpp20\Debug\cpp20.exe
