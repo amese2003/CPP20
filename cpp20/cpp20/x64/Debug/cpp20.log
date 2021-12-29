@@ -1,4 +1,7 @@
 ﻿  cpp20.cpp
-D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(77,31): warning C4101: 'cls1' :참조되지 않은 지역 변수입니다.
-D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(73,21): warning C4101: 'arr' :참조되지 않은 지역 변수입니다.
+D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(39,35): warning C4305: '인수': 'int'에서 '_T1'(으)로 잘립니다.
+          with
+          [
+              _T1=bool
+          ]
   cpp20.vcxproj -> D:\Project\CPP20\cpp20\x64\Debug\cpp20.exe

@@ -10,76 +10,48 @@ using namespace std;
 #include "MyCoroutine.h"
 #include <array>
 
-// 오늘의 주제 : Non-Type Template Parameter
+// 오늘의 주제 : Template Parameter for Lamda
 
-// Non-Type
-// - int, enum
-// - 포인터, 참조값
-// - nullptr_t
+auto sumTyped = [&](int a, int b) {return a + b; };
 
-// C++20
-// - 부동소수점 (floating-point)
-// - Literal Type (types of constexpr variables)
-// - String Literal
+// 두타입이 달라도 됨.
+auto sumGeneric = [](auto a, auto b) {return a + b; }; // C++14 Generic Lambda
 
-template<double d>
-auto GetDouble()
-{
-	return d;
-}
+// 후자가 전자로 convertible (변환 가능) 해야함.
+auto sumDeclType = [](auto a, decltype(a) b) { return a + b; }; // c++ 14 Generic Lambda
 
-struct ClassType
-{
-	constexpr ClassType(int) {}
-};
+// 두 타입이 같아야 함.
+auto sumTemplate = []<typename T>(T a, T b) { return a + b; }; // C++ 20 Template Lambda
 
-template<int N>
-struct IntToType
-{
-	enum { value = N };
-};
-
-template<ClassType c>
-auto GetClassType()
-{
-	return c;
-}
-
-template<int N>
-class StringLiteral
-{
-public:
-	constexpr StringLiteral(char const (&str)[N])
-	{
-		::copy(str, str + N, _data);
-	}
-
-	char _data[N];
-};
-
-template<StringLiteral str>
-class ClassTemplate {};
-
-template<StringLiteral str>
-void FunctionTemplate()
-{
-	cout << str._data << endl;
-}
+auto getVectorSize = []<typename T>(const vector<T>& v) {return v.size(); };
 
 int main()
 {
-	auto d1 = GetDouble<5.5>();
+	int a = 10;
+	int b = 20;
 
-	std::array<int, 5> arr;
+	auto res1 = sumTyped(a, b);
 
-	auto c1 = GetClassType<ClassType(2021)>();
+	auto res2 = sumTyped(true, 100); // 101
 
-	ClassTemplate<"Hello World"> cls1;
-	FunctionTemplate<"Hello World">();
+	auto res3 = sumGeneric(true, 100); // 101
 
-	// 근데 이딴걸 왜씀?
-	// ex) Compile-Time Regular Expression (정규 표현식)
-	// std::regex 같은건 런타임 동작.
-	// 정규 표현식 패턴을 컴파일타임에 안다면, 굳이 런타임까지 갈 필요 없음
+	auto res4 = sumDeclType(true, 100); // 2
 
+	auto res5 = sumTemplate(true, true); // 2
+
+	cout << res1 << endl;
+	cout << res2 << endl;
+	cout << res3 << endl;
+	cout << res4 << endl;
+	cout << res5 << endl;
+
+	vector<int> v1{ 1, 2 };
+	vector<double> v2{ 1.0, 2.0, 3.0 };
+
+	auto s1 = getVectorSize(v1);
+	auto s2 = getVectorSize(v2);
+
+	cout << s1 << endl;
+	cout << s2 << endl;
 }
