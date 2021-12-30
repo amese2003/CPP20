@@ -10,88 +10,54 @@ using namespace std;
 #include "MyCoroutine.h"
 #include <array>
 
-// 오늘의 주제 : Attribute
+// 오늘의 주제 : Range-Based For Loop With Initializer
 
-[[nodiscard]]
-int Func()
+struct User
 {
-	return 10;
-}
-
-class Knight
-{
-public:
-	[[nodiscard("생성자 버리지 마세요!")]]
-	Knight(int hp) : _hp(hp)
-	{
-
-	}
-
-	int _hp = 100;
+	int id;
 };
 
-enum class [[nodiscard("ErrorCode 사용하세요")]] ErrorCode
+User* GetUser()
 {
-	None,
-	Warning,
-	Critical,
-};
 
-ErrorCode GetError()
-{
-	return ErrorCode::Critical;
+
+	return nullptr;
 }
-
-int Sum(vector<int>& v)
-{
-	int ret = 0;
-
-	for (int i = 0; i < v.size(); i++)
-	{
-
-		// 코드 최적화
-		if (v[i] < 0)
-		{
-			[[likely]]
-			ret -= v[i];
-		}
-		else
-		{
-			ret += v[i];
-		}
-	}
-
-	return ret;
-}
-
-struct Empty {};
-
-struct NoUniqueAddress
-{
-	int d;
-
-	[[no_unique_address]]
-	Empty e;
-};
 
 int main()
 {
-	// [[notreturn]] C++11
-	// [[deprecated]] C++14
-	// [[nodiscard]] C++ 17
-	// [[nodiscard("사유")]] C++ 20
+	// C++ 17
+	// if w/ Initializer
+	if (int a = 10; a == 10)
+	{
+		cout << a << endl;
+	}
 
-	// [[likely]] [[unlikely]]
-	// [[no_unique_address]]
+	/*User* user = GetUser();
+	if (user == nullptr || user->id == 0)
+		return;
 
-	int val = Func();
+	User* user2 = nullptr;
 
-	Knight(100);
+	if (User* user = GetUser(); user == nullptr || user->id == 0)
+		return;*/
 
-	GetError();
+	// Switch w/ Initializer
+	switch (int b = 3; b)
+	{
+	case 2:
+		break;
+	case 3:
+		cout << "이게 됨?" << endl;
+		break;
+	}
 
-	NoUniqueAddress n1, n2, n3;
-	cout << &n1.e << endl; 
-	cout << &n2.e << endl;;
-	cout << &n3.e << endl;
+	// Range-Based for
+	for (vector<int> vec{ 1,2,3 }; auto v : vec)
+	{
+		cout << v << endl;
+	}
+
+
+	return 0;
 }
