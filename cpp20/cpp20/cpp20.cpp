@@ -10,54 +10,45 @@ using namespace std;
 #include "MyCoroutine.h"
 #include <array>
 
-// 오늘의 주제 : Range-Based For Loop With Initializer
+// 오늘의 주제 : using enum in Local Scopes
 
-struct User
+enum class Color
 {
-	int id;
+	Red,
+	Black,
+	Blue,
 };
 
-User* GetUser()
-{
 
-
-	return nullptr;
-}
 
 int main()
 {
-	// C++ 17
-	// if w/ Initializer
-	if (int a = 10; a == 10)
+	Color color = Color::Blue;
+
+	switch (color)
 	{
-		cout << a << endl;
-	}
-
-	/*User* user = GetUser();
-	if (user == nullptr || user->id == 0)
-		return;
-
-	User* user2 = nullptr;
-
-	if (User* user = GetUser(); user == nullptr || user->id == 0)
-		return;*/
-
-	// Switch w/ Initializer
-	switch (int b = 3; b)
-	{
-	case 2:
+	case Color::Red:
 		break;
-	case 3:
-		cout << "이게 됨?" << endl;
+	case Color::Black:
+		break;
+	case Color::Blue:
+		break;
+	default:
 		break;
 	}
 
-	// Range-Based for
-	for (vector<int> vec{ 1,2,3 }; auto v : vec)
+	switch (color)
 	{
-		cout << v << endl;
+		using enum Color;
+	case Red:
+		break;
+	case Black:
+		break;
+	case Blue:
+		break;
+	default:
+		break;
 	}
-
 
 	return 0;
 }
