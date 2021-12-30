@@ -1,7 +1,4 @@
 ﻿  cpp20.cpp
-D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(39,35): warning C4305: '인수': 'int'에서 '_T1'(으)로 잘립니다.
-          with
-          [
-              _T1=bool
-          ]
+D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(89,8): warning C4858: 반환 값을 삭제하는 중: 생성자 버리지 마세요!
+D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(91,10): warning C4858: 반환 값을 삭제하는 중: ErrorCode 사용하세요
   cpp20.vcxproj -> D:\Project\CPP20\cpp20\x64\Debug\cpp20.exe

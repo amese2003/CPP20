@@ -10,48 +10,88 @@ using namespace std;
 #include "MyCoroutine.h"
 #include <array>
 
-// 오늘의 주제 : Template Parameter for Lamda
+// 오늘의 주제 : Attribute
 
-auto sumTyped = [&](int a, int b) {return a + b; };
+[[nodiscard]]
+int Func()
+{
+	return 10;
+}
 
-// 두타입이 달라도 됨.
-auto sumGeneric = [](auto a, auto b) {return a + b; }; // C++14 Generic Lambda
+class Knight
+{
+public:
+	[[nodiscard("생성자 버리지 마세요!")]]
+	Knight(int hp) : _hp(hp)
+	{
 
-// 후자가 전자로 convertible (변환 가능) 해야함.
-auto sumDeclType = [](auto a, decltype(a) b) { return a + b; }; // c++ 14 Generic Lambda
+	}
 
-// 두 타입이 같아야 함.
-auto sumTemplate = []<typename T>(T a, T b) { return a + b; }; // C++ 20 Template Lambda
+	int _hp = 100;
+};
 
-auto getVectorSize = []<typename T>(const vector<T>& v) {return v.size(); };
+enum class [[nodiscard("ErrorCode 사용하세요")]] ErrorCode
+{
+	None,
+	Warning,
+	Critical,
+};
+
+ErrorCode GetError()
+{
+	return ErrorCode::Critical;
+}
+
+int Sum(vector<int>& v)
+{
+	int ret = 0;
+
+	for (int i = 0; i < v.size(); i++)
+	{
+
+		// 코드 최적화
+		if (v[i] < 0)
+		{
+			[[likely]]
+			ret -= v[i];
+		}
+		else
+		{
+			ret += v[i];
+		}
+	}
+
+	return ret;
+}
+
+struct Empty {};
+
+struct NoUniqueAddress
+{
+	int d;
+
+	[[no_unique_address]]
+	Empty e;
+};
 
 int main()
 {
-	int a = 10;
-	int b = 20;
+	// [[notreturn]] C++11
+	// [[deprecated]] C++14
+	// [[nodiscard]] C++ 17
+	// [[nodiscard("사유")]] C++ 20
 
-	auto res1 = sumTyped(a, b);
+	// [[likely]] [[unlikely]]
+	// [[no_unique_address]]
 
-	auto res2 = sumTyped(true, 100); // 101
+	int val = Func();
 
-	auto res3 = sumGeneric(true, 100); // 101
+	Knight(100);
 
-	auto res4 = sumDeclType(true, 100); // 2
+	GetError();
 
-	auto res5 = sumTemplate(true, true); // 2
-
-	cout << res1 << endl;
-	cout << res2 << endl;
-	cout << res3 << endl;
-	cout << res4 << endl;
-	cout << res5 << endl;
-
-	vector<int> v1{ 1, 2 };
-	vector<double> v2{ 1.0, 2.0, 3.0 };
-
-	auto s1 = getVectorSize(v1);
-	auto s2 = getVectorSize(v2);
-
-	cout << s1 << endl;
-	cout << s2 << endl;
+	NoUniqueAddress n1, n2, n3;
+	cout << &n1.e << endl; 
+	cout << &n2.e << endl;;
+	cout << &n3.e << endl;
 }
