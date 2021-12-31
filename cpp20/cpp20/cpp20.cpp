@@ -10,66 +10,62 @@ using namespace std;
 #include "MyCoroutine.h"
 #include <array>
 
-// 오늘의 주제 : Span
+// 오늘의 주제 : Container #1
 
-void PrintArray(int* arr, int len)
+// 1. vector, string 등에 constexpr 사용 가능
+// algorithm 100개 이상의 함수들이 constexpr로 바뀜
+
+constexpr int Test()
 {
-	cout << "array size() = " << len << endl;
-	for (int i = 0; i < len; i++)
-		cout << arr[i] << endl;
+	std::vector<int> v{ 1,4,5,2,3 };
+	std::sort(v.begin(), v.end());
+	return v.back();
 }
 
-void Print(std::span<int> container)
+// 2. std::array 만드는 방법이 추가됨 (std::to_array)
+
+// 3. std::make_shared로 shared_ptr 생성 가능
+
+template<typename T>
+struct ArrayDeleter
 {
-	cout << "container size() = " << container.size() << endl;
-	for (int i = 0; i < container.size(); i++)
-		cout << container[i] << endl;
-}
-
-
+	void operator()(const T* ptr)
+	{
+		delete[] ptr;
+	}
+};
 
 int main()
 {
-	// std::span = C배열, std::array, std:;vector, std::string 등의
-	// 연이은 객체 시퀸스 (contiguous sequence of objects)를 참조 (refer)
+	constexpr int ret = Test();
 
-	// c타입 배열
-	int arr[] = { 1,2,3,4,5 };
-	const int size = sizeof(arr);
-	const int len = sizeof(arr) / sizeof(int);
-	PrintArray(arr, len);
-	Print(arr);
+	enum
+	{
+		VALUE = ret
+	};
 
-	// <type T, size_t Extent = dynamic_extent>
-	// std::span
-	// - static_extent = 컴파일 타임에 크기가 정해짐
-	// - dynamic_extent
-	// 포인터 + 크기
 
-	vector<int> myVec{ 1,2,3,4,5 };
-	vector<int> myVec2{ 6,7,8,9,10 };
+	auto arr1 = std::to_array("Hello World");
+	for (auto ch : arr1)
+		cout << ch;
 
-	std::span<int> dynamicSpan(myVec);
-	std::span<int, 5> staticSpan(myVec2);
+	cout << endl;
 
-	Print(dynamicSpan);
-	Print(staticSpan);
+	auto arr2 = std::to_array<int>({1,2,3,4,5});
+	for (auto ch : arr2)
+		cout << ch;
 
-	dynamicSpan = staticSpan;
-	//staticSpan = dynamicSpan; // Error
+	cout << endl;
 
-	// 포인터/사이즈를 이용해서 span 생성
-	std::span<int> span1(myVec.data(), myVec.size());
-	Print(span1);
 
-	// 부분적으로 잘라서 만들기
-	std::span<int> span2(span1.subspan(1, span1.size() - 3));
-	Print(span2);
+	
+	/*int* arr3 = new int[3];
+	delete[] arr3;*/
+	// C++ 11
+	std::shared_ptr<int> sp(new int[10], ArrayDeleter<int>());
 
-	//vector<int> vec3(myVec.begin(), myVec.end());
+	// C++ 20
+	std::shared_ptr<double[]> shared_arr = std::make_shared<double[]>(1024);
 
-	// 1 ~ 2 범위 대상으로, 4함수 실행하고, 3부터 시작해서 기록
-	std::transform(span1.begin(), span1.end(), span1.begin(), [](int i) {return i * i; });
-	Print(span1);
-	Print(myVec); // 원본 데이터가 수정됨!
+	shared_arr[1] = 1.0;
 }
