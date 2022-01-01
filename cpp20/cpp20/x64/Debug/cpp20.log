@@ -1,2 +1,6 @@
 ﻿  cpp20.cpp
+D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(26,28): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(27,29): warning C4018: '<=': signed 또는 unsigned가 일치하지 않습니다.
+D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(28,28): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+D:\Project\CPP20\cpp20\cpp20\cpp20.cpp(29,29): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
   cpp20.vcxproj -> D:\Project\CPP20\cpp20\x64\Debug\cpp20.exe

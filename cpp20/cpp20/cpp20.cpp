@@ -10,40 +10,50 @@ using namespace std;
 #include "MyCoroutine.h"
 #include <array>
 #include <set>
+#include <numbers>
+#include <numeric>
 
-// 오늘의 주제 : Container #3
-// (contains + prefix/suffix  checking)
+// 오늘의 주제 : Arithmetic (산술)
 
 int main()
 {
-	std::set s{ 1,2,3,4,5 };
+	int x = -2;
+	unsigned int y = 10;
 
-	auto findIt = s.find(2);
-	if (findIt != s.end())
-	{
-		cout << "잡았다 요놈" << endl;
-	}
+	unsigned int tempX = (unsigned int)x;
+	auto z = (tempX < y);
 
-	if (s.contains(3))
-	{
-		cout << "잡았다 요놈" << endl;
-	}
+	cout << std::boolalpha;
+	cout << "-2 < 7 = " << (x < y) << endl;
+	cout << "-2 <= 7 = " << (x <= y) << endl;
+	cout << "-2 > 7 = " << (x > y) << endl;
+	cout << "-2 >= 7 = " << (x >= y) << endl;
 
-	std::map<int, int>m{ {1, 100}, {2, 20000} };
+	// c++ 20에서 cmp_XX가 추가됨.
+	cout << "-2 < 7 = " << std::cmp_less(x, y) << endl;
+	cout << "-2 <= 7 = " << std::cmp_less_equal(x, y) << endl;
+	cout << "-2 > 7 = " << std::cmp_greater(x, y) << endl;
+	cout << "-2 >= 7 = " << std::cmp_greater_equal(x, y) << endl;
 
-	if (m.contains(1))
-	{
-		cout << "잡았다 요놈" << endl;
-	}
 
-	// string의 prefix/suffix (starts_with, ends_with)
-	std::string str = "Hello World";
+	// non-integer 정수가 아닌 애들을 넣으면?
+	// std::cmp_less(3, 1.4f) // error
 
-	bool b1 = str.starts_with("Hel");
-	bool b2 = str.ends_with("rld");
 
-	cout << b1 << endl;
-	cout << b2 << endl;
+	// 수학 상수 기호들이 추가됨.
+	const float Pi = 3.14f;
+	std::numbers::pi;
+	std::numbers::pi_v<float>;
+	std::numbers::sqrt2;
+	std::numbers::e;
 
+	// 중간값
+	// (a + (b-a) / 2)
+	constexpr int mid =	std::midpoint(10, 20);
+
+	// 선형 보간
+	// [A  | B]
+	// (a + t * (b-a))
+	constexpr int ler = std::lerp(10, 20, 0.5);
 
 }
