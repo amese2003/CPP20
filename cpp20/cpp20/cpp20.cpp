@@ -14,99 +14,78 @@ using namespace std;
 #include <numeric>
 #include <bit>
 #include <bitset>
+#include <chrono>
 
-// 오늘의 주제 : 비트 연산
+// 오늘의 주제 : Calendar
 
-unsigned int BitCount(unsigned int flag)
-{
-	if (flag == 0)
-		return 0;
-
-	// 0b1010100
-	// 0b101010
-	return flag % 2 + BitCount(flag / 2);
-}
 
 int main()
 {
-	// 암호학
-	// 게임서버 ID (uint64)
-	// 기타 알고리즘 문제
+	// C++에 추가된 Time 라이브러리
+	// - time point
+	// - time duration
+	// - clock
 
-	// 파자집 : 피자 주문하는데, 0 ~ 19번 스무가지의 토핑이 존재
-	//bool toppings[20];
+	// hh_mm_ss : duration since midnight, split into hours, minutes, seconds, fractional seconds
 
-	{
-		// 전체 구하기
-		unsigned int fullPiza = (1 << 20) - 1;
+	// C++ 11 chrono
+	// C++ 20 calendar, time_zone
 
-		// 추가
-		enum {PEPPERONI = 3};
-		unsigned int toppings = 0;
-		toppings |= (1 << PEPPERONI);
+	auto timeOfDay = std::chrono::hh_mm_ss(10.5h + 32min + 1004s + 0.6s);
 
-		bool added = (toppings & (1 << PEPPERONI));
 
-		toppings &= ~(1 << PEPPERONI);
+	cout << timeOfDay << endl;
+	cout << timeOfDay.hours() << endl;
+	cout << timeOfDay.minutes() << endl;
+	cout << timeOfDay.seconds() << endl;
+	cout << timeOfDay.subseconds() << endl;
+	cout << timeOfDay.to_duration() << endl;
 
-		toppings ^= (1 << PEPPERONI);
 
-		int count = BitCount(toppings);
+	// Calenar Date
+	using namespace chrono;
+	chrono::year_month_day ymd1{ year(2022), month(1), day(2) };
+	chrono::year_month_day ymd2{ year(2021) / month(11) / day(14) };
+	chrono::year_month_day ymd3{ 2021y, November, 14d };
 
-		// 최소 원소 찾기
 
-		// (끝에 붙에있는 0은 몇개인가?)
-		// vs c++ : _BitScanForward(&index, toppings)
-		// gcc : __builtin_ctz(toppings);
+	cout << ymd1 << endl;
+	cout << ymd2 << endl;
+	cout << ymd3 << endl;
 
-		int a = 3;
-	}
 
-	// 엔디안
-	int b = 0x11223344;
-	// [44 33 22 11] little
-	// [11 22 33 44] big
+	// year month day
+	// day month year
+	// month day year
+	std::chrono::year_month_day_last ymdl1 = 2021y / November / last;
+	std::chrono::year_month_day_last ymdl2 = last / 11 / 2021y;
+	std::chrono::year_month_day_last ymdl3 = November / last / 2021;
 
-	// 네트워크, 파일 입출력
-	if (std::endian::native == std::endian::big)
-	{
-		cout << "big" << endl;
-	}
-	else
-	{
-		cout << "little" << endl;
-	}
+	auto d1 = ymdl1.day();
+	chrono::year_month_day ymd4{ ymdl1 };
+	chrono::year_month_weekday ymwkd1{ year(2021) / November / Friday[4] };
+	chrono::year_month_day ymd5{ ymwkd1 };
 
-	float n1 = 1.0f;
-	int n2 = static_cast<int>(n1);
+	time_point timePoint = chrono::sys_days(ymd1);
 
-	int n3 = bit_cast<int>(n1);
+	// Cute Syntax
+	// 2021y, 30d, January, February ...., December
 
-	// bit_cast : 새로운 캐스팅
-	// has_single_bit	: 어떤 숫자가 2^n 형태인지 (2의 거듭제곱)
-	// popcount : unsigned int 숫자에서 1의 개수
-	// bit_ceil : 해당 값보다 작지 않은 (2의 거듭제곱)중 제일 작은 것 (floor < num < ceil)
-	// bit_floor : 해당 값보다 크지 않은 (2의 거듭제곱)중 제일 큰 것 (floor < num < ceil)
-	// bit_width : 해당 값을 표현하기 위해 필요한 최소 비트 개수
-	// rotl : bitwise left-rotation
-	// rotr : bitwise right-rotation
-	// countl_zero : 제일 큰 비트부터 시작해서, 연속된 0의 개수
-	// countl_one : 제일 큰 비트부터 시작해서, 연속된 1의 개수
-	// countr_zero : 제일 작은 비트부터 시작해서, 연속된 0의 개수
-	// countr_one : 제일 작은 비트부터 시작해서, 연속된 1의 개수
+	// Validation
+	std::chrono::day d{ 31 };
+	d++;
 
-	std::uint8_t num = 0b00110010;
-	cout << boolalpha;
+	bool valid = d.ok();
 
-	cout << std::has_single_bit(num) << endl; // false
-	cout << popcount(num) << endl; // 3
-	cout << std::bitset<8>(std::bit_ceil(num)) << endl; // 0b01000000
-	cout << std::bitset<8>(std::bit_floor(num)) << endl; // 
-	cout << std::bit_width(5u) << endl; // width(0x000101) = 3
-	cout << std::bitset<8>(std::rotl(num, 2)) << endl; // 0b11001000
-	cout << std::bitset<8>(std::rotr(num, 2)) << endl; // 0b10001100
-	cout << countl_zero(num) << endl; // 2
-	cout << countl_one(num) << endl; // 0
-	cout << countr_zero(num) << endl; // 1
-	cout << countr_one(num) << endl; // 0
+	auto leapYear2000{ year(2000) / 2 / 29 };
+	auto leapYear2001{ year(2001) / 2 / 29 };
+	auto leapYear2002{ year(2002) / 2 / 29 };
+
+	bool valid2 = leapYear2000.ok();
+	bool valid3 = leapYear2001.ok();
+	bool valid4 = leapYear2002.ok();
+
+	auto now = std::chrono::system_clock::now();
+	auto diff = floor<chrono::seconds>(now) - sys_days(1993y / December / 25d);
+	cout << diff << endl;
 }
