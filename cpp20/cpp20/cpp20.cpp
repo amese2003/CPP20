@@ -16,76 +16,40 @@ using namespace std;
 #include <bitset>
 #include <chrono>
 
-// 오늘의 주제 : Calendar
-
+using namespace std::chrono;
+// 오늘의 주제 : Time Zone
 
 int main()
 {
-	// C++에 추가된 Time 라이브러리
-	// - time point
-	// - time duration
-	// - clock
+	// 온라인 게임 (한국 / 북미 / 유럽)
+	// 프랑스 / 독일 / 러시아 / 영국 / .....
+	// 와우 - 오전 6시 던전 / 일퀘 리셋
+	// DB 시간 저장할 때? 로컬 시간? UTC 시간?
 
-	// hh_mm_ss : duration since midnight, split into hours, minutes, seconds, fractional seconds
+	// UTC (Coordinated Universal Time 협정 세계시) <-> Local Time (실행 환경)
+	// - 영국 UTC+0.00 (Greennwich Mean Time, GMT)
+	// - 한국 UTC+9.00
+	// - 뉴욕 UTC-5.00
 
-	// C++ 11 chrono
-	// C++ 20 calendar, time_zone
+	cout << "UTC" << endl;
+	auto utcTime = system_clock::now();
+	cout << utcTime << endl;
 
-	auto timeOfDay = std::chrono::hh_mm_ss(10.5h + 32min + 1004s + 0.6s);
+	// C++ 서버 <-> C# 클라
+	// UNIX Epoch (유닉스 시간) - 위키피디아
+	// 1970년 1월 1일 00:00:00 협정 세계시 (UTC) 부터 경과시간을 초로 환산하여 정수로 나타낸 것이다.
 
+	__int64 hoursSinceUtc = duration_cast<hours>(utcTime.time_since_epoch()).count();
+	cout << "Hours : " << hoursSinceUtc << endl;
+	__int64 utcEpoch = duration_cast<seconds>(utcTime.time_since_epoch()).count();
+	cout << "Epoch : " << utcEpoch << endl;
 
-	cout << timeOfDay << endl;
-	cout << timeOfDay.hours() << endl;
-	cout << timeOfDay.minutes() << endl;
-	cout << timeOfDay.seconds() << endl;
-	cout << timeOfDay.subseconds() << endl;
-	cout << timeOfDay.to_duration() << endl;
+	cout << "Local" << endl;
+	auto localTime = zoned_time(current_zone(), utcTime);
+	auto localTime2 = zoned_time("Asia/Shanghai"s, utcTime);
+	cout << localTime << endl;
+	cout << localTime2 << endl;
 
-
-	// Calenar Date
-	using namespace chrono;
-	chrono::year_month_day ymd1{ year(2022), month(1), day(2) };
-	chrono::year_month_day ymd2{ year(2021) / month(11) / day(14) };
-	chrono::year_month_day ymd3{ 2021y, November, 14d };
-
-
-	cout << ymd1 << endl;
-	cout << ymd2 << endl;
-	cout << ymd3 << endl;
-
-
-	// year month day
-	// day month year
-	// month day year
-	std::chrono::year_month_day_last ymdl1 = 2021y / November / last;
-	std::chrono::year_month_day_last ymdl2 = last / 11 / 2021y;
-	std::chrono::year_month_day_last ymdl3 = November / last / 2021;
-
-	auto d1 = ymdl1.day();
-	chrono::year_month_day ymd4{ ymdl1 };
-	chrono::year_month_weekday ymwkd1{ year(2021) / November / Friday[4] };
-	chrono::year_month_day ymd5{ ymwkd1 };
-
-	time_point timePoint = chrono::sys_days(ymd1);
-
-	// Cute Syntax
-	// 2021y, 30d, January, February ...., December
-
-	// Validation
-	std::chrono::day d{ 31 };
-	d++;
-
-	bool valid = d.ok();
-
-	auto leapYear2000{ year(2000) / 2 / 29 };
-	auto leapYear2001{ year(2001) / 2 / 29 };
-	auto leapYear2002{ year(2002) / 2 / 29 };
-
-	bool valid2 = leapYear2000.ok();
-	bool valid3 = leapYear2001.ok();
-	bool valid4 = leapYear2002.ok();
-
-	auto now = std::chrono::system_clock::now();
-	auto diff = floor<chrono::seconds>(now) - sys_days(1993y / December / 25d);
-	cout << diff << endl;
+	auto offset = localTime.get_info().offset;
+	cout << offset << endl;
 }
