@@ -18,59 +18,63 @@ using namespace std;
 #include <format>
 #include <source_location>
 #include <functional>
+#include <atomic>
+#include <thread>
 
-// 오늘의 주제 : 기타 함수
+// 오늘의 주제 : atomic
 
-void PrintLog(const char* filename, int line)
-{
-	cout << format("{} Line({})", filename, line) << endl;
-}
-
-int Add(int a, int b)
-{
-	return a + b;
-}
-
-void Test()
-{
-	if (std::is_constant_evaluated())
-	{
-		// 컴파일
-	}
-	else
-	{
-		// 런타임
-	}
-}
 
 int main()
 {
-	// 로그 남길 때
-	// 멀티스레드 환경에서 데드락 탐지
-	// 메모리 누수를 잡기 위해서 할당/해제
-	// source_location
-	PrintLog(__FILE__, __LINE__);
+	// atomic_ref
+	int value = 0;
 
-	auto src = std::source_location::current();
-	PrintLog(src.file_name(), src.line());
+	//int& ref = value;
+	atomic_ref<int> ref(value);
+
+	thread t1([&ref]() {
+
+		for (int i = 0; i < 1000000; i++)
+			ref++;
+		});
+
+	thread t2([&ref]() {
+
+		for (int i = 0; i < 1000000; i++)
+			ref--;
+		});
+
+	t1.join();
+	t2.join();
+
+	cout << ref << endl;
+	// atomic shared_ptr
+
+	// shared_ptr
+
+	// [resource(data)][control block]
+	// Thread-Safe?
+	// - control block은 thread-safe한게 맞다.
 
 
-	// bind_front
-	//Add(10, 20);
-	using namespace std::placeholders;
-	auto func = std::bind(Add, 10, _1);
-	cout << func(20) << endl;
+	class User
+	{
+	public:
+		int id = 0;
+		int hp = 0;
+	};
 
-	auto func2 = std::bind_front(Add, 10);
-	cout << func2(20) << endl;
+	shared_ptr<User> targetUser = make_shared<User>();
 
-	auto func3 = [](int b) { return Add(10, b); };
-	cout << func3(20) << endl;
+	targetUser = make_shared<User>();
 
-	// is_constant_evaluated
-	// consteval 붙은 함수는 컴파일 타임에 실행됨
-	// constexpr 붙은 함수는 컴파일/런타임 둘다 됨
-	// 보통 함수 런타임
 
-	
+	targetUser = make_shared<User>();
+
+	// atomic_shared_ptr 과 atomic_weak_ptr이 제안 되었음
+	// atomic<shared_ptr<T>>, atomic<weak_ptr<T>>
+	atomic<shared_ptr<User>> atomicSharedPtr = make_shared<User>();
+
+	// LockFree 프로그래밍 유용
+	// 일상에선 사용할까?
 }
