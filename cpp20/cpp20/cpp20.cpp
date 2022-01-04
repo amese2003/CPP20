@@ -21,58 +21,93 @@ using namespace std;
 #include <atomic>
 #include <thread>
 #include <semaphore>
+#include <latch>
+#include <barrier>
+#include <mutex>
 
-// 오늘의 주제 : semaphore
+// 오늘의 주제 : latch / barrier
 
-counting_semaphore<1> sem(0);
-vector<int> vec;
+using namespace std;
 
-void PrepareWork()
+std::latch workDone(5);
+std::mutex coutMutex;
+
+
+void Print(string msg)
 {
-	vec.insert(vec.end(), { 1,2,3,4,5 });
-
-	this_thread::sleep_for(1s);
-
-	cout << "데이터 준비됨." << endl;
-	sem.release();
+	coutMutex.lock();
+	cout << msg << endl;
+	coutMutex.unlock();
 }
 
-void CompleteWork()
+void DoWork(string name)
 {
-	cout << "데이터 기다리는중..." << endl;
-	sem.acquire();
+	Print(name);
+	// TODO
+	workDone.arrive_and_wait(); // decrement + blocking
+}
 
-	cout << "데이터 출력중" << endl;
+void TestLatch()
+{
+	vector<thread> threads;
+	for (int i = 0; i < 5; i++)
+		threads.push_back(thread(DoWork, format("{}", i)));
 
-	for (auto n : vec)
-		cout << n << endl;
+	for (int i = 0; i < 5; i++)
+		threads[i].join();
+
+	cout << "잡 완료" << endl;
+}
+
+std::barrier workDone2(5);
+
+void DoFullTimeJob()
+{
+	workDone2.arrive_and_wait(); // 카운트 1 줄이고, 0 될때까지 대기.
+
+	Print("Morning Job Done");
+
+
+	// -- 재사용
+	// [3]
+
+	workDone2.arrive_and_wait();
+	Print("Afternoon Job Done");
+}
+
+void DoPartTimeJob()
+{
+	workDone2.arrive_and_drop(); // 카운트 1 줄이고, 0 될떄까지 대기. 그리고 카운트 초기값 1 감소
+	Print("Morning Job Done");
+}
+
+void TestBarrier()
+{
+	vector<thread> threads;
+
+	for (int i = 0; i < 3; i++)
+		threads.push_back(thread(DoFullTimeJob));
+
+	for (int i = 0; i < 2; i++)
+		threads.push_back(thread(DoPartTimeJob));
+
+	for (thread& t : threads)
+		t.join();
 }
 
 int main()
 {
-	// mutex
-	// 화장실 키
-	// [키]
+	// Producer - Consumer
 
-	// semaphore
-	// 화장실
-	// [키][키][키]
+	// latch : 1회용
+	// barrier : 재사용
 
-	//counting_semaphore<3>;
-	//binary_semaphore = counting_semaphore<1>;
+	// future, condition_variable 등으로 할 수 있는데 굳이?
+	// 새로운 기능이 있는건 아닌데 사용법이 간단하고 가장 속도가 빠름.
+	//TestLatch();
+	//
 
-	// max(); // 최대 카운터값
-	// acquire(); // counter를 1만큼 감소 (counter = 0 이면 양수 될 때 까지 대기)
-	// release(upd = 1); // counter를 upd만큼 증가 (대기하던 스레드가 있으면 풀어줌)
-	// try_acquire(); // 카운터가 0보다 크면, 1감소
-	// try_acquire_for(relTime); // 최대 relTime만큼 counter를 1 감소하려 시도
-	// try_acquire_until(absTime); // 최대 absTime까지 counter를 1 감소하려 시도
-
-	thread t1(PrepareWork);
-	thread t2(CompleteWork);
-
-	t1.join();
-	t2.join();
+	TestBarrier();
 
 	return 0;
 }
