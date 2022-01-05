@@ -25,89 +25,62 @@ using namespace std;
 #include <barrier>
 #include <mutex>
 
-// 오늘의 주제 : latch / barrier
+// 오늘의 주제 : jthread
 
 using namespace std;
 
-std::latch workDone(5);
-std::mutex coutMutex;
+mutex mut;
 
-
-void Print(string msg)
+void ThreadMain()
 {
-	coutMutex.lock();
-	cout << msg << endl;
-	coutMutex.unlock();
+	mut.lock();
+
+	while (true)
+	{
+		// 오래 걸리는 작업
+	}
+
+	mut.unlock();
 }
 
-void DoWork(string name)
+void JThreadMain(std::stop_token token)
 {
-	Print(name);
-	// TODO
-	workDone.arrive_and_wait(); // decrement + blocking
-}
+	while (true)
+	{
+		// 오래 걸리는 작업
+		if (token.stop_requested())
+			break;
+	}
 
-void TestLatch()
-{
-	vector<thread> threads;
-	for (int i = 0; i < 5; i++)
-		threads.push_back(thread(DoWork, format("{}", i)));
-
-	for (int i = 0; i < 5; i++)
-		threads[i].join();
-
-	cout << "잡 완료" << endl;
-}
-
-std::barrier workDone2(5);
-
-void DoFullTimeJob()
-{
-	workDone2.arrive_and_wait(); // 카운트 1 줄이고, 0 될때까지 대기.
-
-	Print("Morning Job Done");
-
-
-	// -- 재사용
-	// [3]
-
-	workDone2.arrive_and_wait();
-	Print("Afternoon Job Done");
-}
-
-void DoPartTimeJob()
-{
-	workDone2.arrive_and_drop(); // 카운트 1 줄이고, 0 될떄까지 대기. 그리고 카운트 초기값 1 감소
-	Print("Morning Job Done");
-}
-
-void TestBarrier()
-{
-	vector<thread> threads;
-
-	for (int i = 0; i < 3; i++)
-		threads.push_back(thread(DoFullTimeJob));
-
-	for (int i = 0; i < 2; i++)
-		threads.push_back(thread(DoPartTimeJob));
-
-	for (thread& t : threads)
-		t.join();
+	cout << "끝." << endl;
 }
 
 int main()
 {
-	// Producer - Consumer
+	/*thread t1(ThreadMain);
 
-	// latch : 1회용
-	// barrier : 재사용
+	t1.join();
 
-	// future, condition_variable 등으로 할 수 있는데 굳이?
-	// 새로운 기능이 있는건 아닌데 사용법이 간단하고 가장 속도가 빠름.
-	//TestLatch();
-	//
+	vector<thread> threads;
+	for (int i = 0; i < 5; i++)
+		threads.push_back(thread(ThreadMain));
 
-	TestBarrier();
+	for (int i = 0; i < 5; i++)
+		threads[i].join();*/
+
+
+	// Joining Thread
+	jthread jt(JThreadMain);
+
+	// source -> token 추출 -> 새로운 스레드에 전달
+	//jt.get_stop_source().get_token();
+	//jt.get_stop_token();
+
+	// cooperative interruption
+	// 말 그대로 '요청' 한 것. 상대방이 무시하면 뭐...
+	//jt.request_stop();
+
+
 
 	return 0;
 }
