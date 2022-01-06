@@ -24,62 +24,32 @@ using namespace std;
 #include <latch>
 #include <barrier>
 #include <mutex>
+#include <syncstream>
 
-// 오늘의 주제 : jthread
+// 오늘의 주제 : synchronized output
 
 using namespace std;
 
-mutex mut;
-
-void ThreadMain()
-{
-	mut.lock();
-
-	while (true)
-	{
-		// 오래 걸리는 작업
-	}
-
-	mut.unlock();
-}
-
-void JThreadMain(std::stop_token token)
+void ThreadMain(int threadId)
 {
 	while (true)
 	{
-		// 오래 걸리는 작업
-		if (token.stop_requested())
-			break;
+		// accumulate output in an internal buffer and write their content in an atomic step
+		std::osyncstream syncStream(std::cout);
+		syncStream << format("안녕 나는 스레드 {}", threadId) << endl;
+		this_thread::sleep_for(1s);
 	}
 
-	cout << "끝." << endl;
 }
 
 int main()
 {
-	/*thread t1(ThreadMain);
+	vector<jthread> threads;
 
-	t1.join();
-
-	vector<thread> threads;
-	for (int i = 0; i < 5; i++)
-		threads.push_back(thread(ThreadMain));
-
-	for (int i = 0; i < 5; i++)
-		threads[i].join();*/
-
-
-	// Joining Thread
-	jthread jt(JThreadMain);
-
-	// source -> token 추출 -> 새로운 스레드에 전달
-	//jt.get_stop_source().get_token();
-	//jt.get_stop_token();
-
-	// cooperative interruption
-	// 말 그대로 '요청' 한 것. 상대방이 무시하면 뭐...
-	//jt.request_stop();
-
+	for (int i = 0; i < 3; i++)
+	{
+		threads.push_back(jthread(ThreadMain, i));
+	}
 
 
 	return 0;
